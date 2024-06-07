@@ -1,0 +1,101 @@
+#!/usr/bin/env python3
+
+import argparse
+import re
+import sys
+import os
+
+
+# Checks if string is valid regex
+def is_valid_regex(regex_str):
+    try:
+        re.compile(regex_str)
+        is_valid = True
+    except re.error:
+        is_valid = False
+
+    return (is_valid)
+
+
+# Parse command-line arguments
+def parse_args():
+
+    parser = argparse.ArgumentParser(prog="mini-grep",
+                                     description="Minimal version of grep",
+                                     add_help=True)
+
+    # Optional argument to make the script quieter. False by default
+    parser.add_argument("-q", dest="quiet", help="(q)uiet only outputs lines\
+                         but omits the matching line numbers",
+                        action='store_true', required=False)
+
+    # Required regex pattern argument
+    parser.add_argument("-e", dest="PATTERN",
+                        help="valid regex pattern to search for", type=str,
+                        required=True)
+
+    # FILE variadic argument
+    parser.add_argument("FILE", action='store', type=str, nargs='*')
+    args = parser.parse_args()
+
+    return args
+
+
+# Find regex pattern matches in requested files
+def find_file_matches(file_list, regex_pattern):
+
+    # Iterate through the received file list
+    for file in file_list:
+
+        # If file given, isn't a file, exit fatally
+        if not os.path.isfile(file):
+            sys.exit("ERROR: " + file + " is not a file.")
+
+        # Iterate through the file's lines, print regex-matching ones
+        for i, line in enumerate(open(file)):
+            for match in re.finditer(regex_pattern, line):
+                print('ln %s in %s: %s' % (i+1, file, match.group()))
+
+
+def find_stdin_matches(input_str, regex_pattern):
+    print("~~~~~~~~~~~~~~~~~~~")
+    r = re.compile(regex_pattern)
+    newlist = list(filter(r.match, input_str))
+    print(newlist)
+    #for i, line in enumerate(input_str):
+        #for match in re.finditer(regex_pattern, line):
+            #print('ln %s: %s' % (i+1, match.group()))
+
+    print("~~~~~~~~~~~~~~~~~~~")
+
+
+# Main function
+def main():
+    args = parse_args()
+    print("----start----")
+    print("quiet = ", args.quiet)
+    print("pattern = ", args.PATTERN)
+    print("FILE = ", args.FILE)
+    print("----end------")
+
+    # Check if received regex pattern is valid
+    if not is_valid_regex(args.PATTERN):
+        sys.exit("ERROR: regex pattern " + args.PATTERN + " is invalid!")
+
+    # If args.FILE is an empty list, we will parse entries from stdin
+    if not len(args.FILE):
+
+        # TODO: here we put the stdin stuff
+        print("Enter your text below:")
+        input_str = sys.stdin.readlines()
+        find_stdin_matches(input_str, args.PATTERN)
+        #find_file_matches(files_list, args.PATTERN)
+
+
+    # Else, args.FILE isn't an empty list, so we parse each file for regex matches
+    else:
+        find_file_matches(args.FILE, args.PATTERN)
+
+
+if __name__ == "__main__":
+    main()
