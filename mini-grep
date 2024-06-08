@@ -5,9 +5,6 @@ import re
 import sys
 import os
 
-"""
-TODO 1. cleanup of comments, pep compliant, quiet option, check everything
-"""
 
 # Checks if string is valid regex
 def is_valid_regex(regex_str):
@@ -49,30 +46,28 @@ def enum_and_match(file, regex_pattern, stdin_ln_list, quiet_flag):
     # If file was given
     if file:
         enum_iter = open(file)
-        filename = file
-        # Iterate through the file's lines, print regex-matching ones
-        #for i, line in enumerate(open(file)):
-            #for match in re.finditer(regex_pattern, line):
-                #print('ln %s in %s: %s' % (i+1, file, match.group()))
 
     # Else if stdin input was given
     elif stdin_ln_list:
         enum_iter = stdin_ln_list
-        filename = "stdin"
-        #for i, line in enumerate(stdin_ln_list):
-            #for match in re.finditer(regex_pattern, line):
-                #print('ln %s in %s: %s' % (i+1, "stdin", match.group()))
 
-
+    # Enumerate the file or stdin input
     for i, line in enumerate(enum_iter):
+
+        # For each matching line, we print it
         for match in re.finditer(regex_pattern, line):
+
+            # If quiet output was requested, we print only the matching line
             if quiet_flag:
                 print('%s' % match.group())
+
+            # If quiet output wasn't requested,
+            # we print matching line number and line
             else:
                 print('%s: %s' % (i+1,  match.group()))
 
+    # If file was given, we close it
     if file:
-        #print("~~~closing file", file)
         enum_iter.close()
 
 
@@ -88,29 +83,18 @@ def find_file_matches(file_list, regex_pattern, quiet_flag):
 
         # Iterate through the file's lines, print regex-matching ones
         enum_and_match(file, regex_pattern, None, quiet_flag)
-        #for i, line in enumerate(open(file)):
-            #for match in re.finditer(regex_pattern, line):
-                #print('ln %s in %s: %s' % (i+1, file, match.group()))
 
 
 # Find regex pattern matches from stdin
-# TODO: input_str should be input_list or sth
 def find_stdin_matches(stdin_ln_list, regex_pattern, quiet_flag):
     print("~~~~~~~~~~~~~~~~~~~")
     enum_and_match(None, regex_pattern, stdin_ln_list, quiet_flag)
-    #for i, line in enumerate(input_str):
-        #for match in re.finditer(regex_pattern, line):
-            #print('ln %s in %s: %s' % (i+1, "stdin", match.group()))
     print("~~~~~~~~~~~~~~~~~~~")
+
 
 # Main function
 def main():
     args = parse_cmd_args()
-    #print("----start----")
-    #print("quiet = ", args.quiet)
-    #print("pattern = ", args.PATTERN)
-    #print("FILE = ", args.FILE)
-    #print("----end------")
 
     # Check if received regex pattern is valid
     if not is_valid_regex(args.PATTERN):
@@ -119,12 +103,13 @@ def main():
     # If args.FILE is an empty list, we will parse entries from stdin
     if not len(args.FILE):
 
-        # TODO: here we put the stdin stuff
         print("Enter your text below:")
-        stdin_ln_list = sys.stdin.readlines()
-        find_stdin_matches(stdin_ln_list, args.PATTERN, args.quiet)
-        #find_file_matches(files_list, args.PATTERN)
 
+        # Read stdin input as list variable
+        stdin_ln_list = sys.stdin.readlines()
+
+        # Find matches
+        find_stdin_matches(stdin_ln_list, args.PATTERN, args.quiet)
 
     # Else, file arguments were given, so we parse them for regex matches
     else:
