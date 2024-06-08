@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+""" A minimal version of grep, with some limited options """
 
 import argparse
 import re
@@ -6,19 +7,19 @@ import sys
 import os
 
 
-# Checks if string is valid regex
 def is_valid_regex(regex_str):
+    """ Checks if string is valid regex """
     try:
         re.compile(regex_str)
         is_valid = True
     except re.error:
         is_valid = False
 
-    return (is_valid)
+    return is_valid
 
 
-# Parse command-line arguments
 def parse_cmd_args():
+    """ Parse command-line arguments """
 
     parser = argparse.ArgumentParser(prog="mini-grep",
                                      description="Minimal version of grep",
@@ -42,14 +43,20 @@ def parse_cmd_args():
 
 
 def enum_and_match(file, regex_pattern, stdin_ln_list, quiet_flag):
+    """ Enumerate stdin input list or a file's lines """
 
     # If file was given
     if file:
-        enum_iter = open(file)
+        with open(file, encoding='utf-8') as f:
+            enum_iter = f.readlines()
 
     # Else if stdin input was given
     elif stdin_ln_list:
         enum_iter = stdin_ln_list
+
+    # If no file and no stdin input was given
+    else:
+        sys.exit("ERROR: file list or stdin input is invalid!")
 
     # Enumerate the file or stdin input
     for i, line in enumerate(enum_iter):
@@ -59,20 +66,16 @@ def enum_and_match(file, regex_pattern, stdin_ln_list, quiet_flag):
 
             # If quiet output was requested, we print only the matching line
             if quiet_flag:
-                print('%s' % match.group())
+                print(f"{match.group()}")
 
             # If quiet output wasn't requested,
             # we print matching line number and line
             else:
-                print('%s: %s' % (i+1,  match.group()))
-
-    # If file was given, we close it
-    if file:
-        enum_iter.close()
+                print(f"{i+1}: {match.group()}")
 
 
-# Find regex pattern matches in requested files
 def find_file_matches(file_list, regex_pattern, quiet_flag):
+    """ Find regex pattern matches in requested files """
 
     # Iterate through the received file list
     for file in file_list:
@@ -85,8 +88,9 @@ def find_file_matches(file_list, regex_pattern, quiet_flag):
         enum_and_match(file, regex_pattern, None, quiet_flag)
 
 
-# Main function
 def main():
+    """ Main function """
+
     args = parse_cmd_args()
 
     # Check if received regex pattern is valid
@@ -94,7 +98,7 @@ def main():
         sys.exit("ERROR: regex pattern " + args.PATTERN + " is invalid!")
 
     # If args.FILE is an empty list, we will parse entries from stdin
-    if not len(args.FILE):
+    if not args.FILE:
 
         print("Enter your text below:")
 
