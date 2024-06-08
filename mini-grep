@@ -85,13 +85,6 @@ def find_file_matches(file_list, regex_pattern, quiet_flag):
         enum_and_match(file, regex_pattern, None, quiet_flag)
 
 
-# Find regex pattern matches from stdin
-def find_stdin_matches(stdin_ln_list, regex_pattern, quiet_flag):
-    print("~~~~~~~~~~~~~~~~~~~")
-    enum_and_match(None, regex_pattern, stdin_ln_list, quiet_flag)
-    print("~~~~~~~~~~~~~~~~~~~")
-
-
 # Main function
 def main():
     args = parse_cmd_args()
@@ -108,8 +101,11 @@ def main():
         # Read stdin input as list variable
         stdin_ln_list = sys.stdin.readlines()
 
+        # Adding for better readability
+        print("")
+
         # Find matches
-        find_stdin_matches(stdin_ln_list, args.PATTERN, args.quiet)
+        enum_and_match(None, args.PATTERN, stdin_ln_list, args.quiet)
 
     # Else, file arguments were given, so we parse them for regex matches
     else:
