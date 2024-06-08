@@ -35,13 +35,13 @@ This line in textfile2 is about Dylan, since he wrote it.
 5. We can test that the stdin line matching works by running: ```python3 mini_grep -e "^Dylan$"```
 which returns
 `Enter your text below`
-and then we can enter these three lines
+and then we can enter from the keyboard these three lines
 ```
 This is Dylan
 Dylan
 Dylan is not here
 ```
-which gives us the output 
+then we have to signal EOF (e.g. by using Ctrl+D on Linux) which gives us the output 
 ```
 
 2: Dylan
